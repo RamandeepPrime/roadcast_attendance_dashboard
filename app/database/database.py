@@ -27,6 +27,12 @@ class Shift(Base):
     day = Column(Enum(Weekday), nullable=False)
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
+    
+    __table_args__ = (
+        UniqueConstraint(
+            day, start_time, end_time, name="unique_shifts_constraint"
+        ),
+    )
 
 
 class Roster(Base):
@@ -51,7 +57,6 @@ class RosterMember(Base):
     roster = relationship("Roster")
     user = relationship("User")
     
-    # unique constraint for roster_id and user_id
 
 class RosterMemberOffDay(Base):
     __tablename__ = "roster_member_off_days"
@@ -70,8 +75,6 @@ class RosterShift(Base):
     roster_member = relationship("RosterMember")
     shift = relationship("Shift")
     
-    # unique constraint for roster_member_id and shift_id
-    # how to check if user already a part of another roster ?
     __table_args__ = (
         UniqueConstraint(
             roster_member_id, shift_id, name="unique_roster_shift"
@@ -83,19 +86,13 @@ class Attendance(Base):
     __tablename__ = "attendance"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    # user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     roster_shift_id = Column(Integer, ForeignKey("roster_shifts.id", ondelete="CASCADE"), nullable=False)
-    # roster_id = Column(Integer, ForeignKey("rosters.id"), nullable=False)
     attendance_date = Column(Date, nullable=False)
-    # checkin_time = Column(TIMESTAMP, nullable=True)
-    # checkout_time = Column(TIMESTAMP, nullable=True)
     timestamp = Column(TIMESTAMP, nullable=True)
     image_path = Column(Text, nullable=False)
     status = Column(Enum(AttendanceStatus), default=AttendanceStatus.ABSENT)
 
-    # user = relationship("User")
     shift = relationship("RosterShift")
-    # roster = relationship("Roster")
     
     __table_args__ = (
         UniqueConstraint(

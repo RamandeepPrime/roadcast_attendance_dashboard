@@ -5,7 +5,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-from app.database import AsyncSessionFactory, engine
+from app.database import AsyncEngine
 from app.database.database import Base
 
 # this is the Alembic Config object, which provides
@@ -77,7 +77,7 @@ async def run_migrations_online() -> None:
     #     poolclass=pool.NullPool,
     # )
 
-    async with engine.connect() as session:
+    async with AsyncEngine.connect() as session:
         await session.run_sync(do_run_migrations)
 
 

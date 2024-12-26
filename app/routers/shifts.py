@@ -4,9 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db_instance
 from app.database.database import User
 from app.database.enums import Role
-from app.database.queries.shifts import assign_shift_to_staff_db, get_allocated_shifts_db, get_shift_details_db, swap_shifts_db
+from app.database.queries.shifts import assign_shift_to_staff_db, create_shift_db, get_allocated_shifts_db, get_shift_details_db, swap_shifts_db
 from app.database.queries.user import get_user_by_email_db
-from app.routers.pydantics.shifts import AssignShiftsRequestModel, SwapShiftsRequestModel
+from app.routers.pydantics.shifts import AssignShiftsRequestModel, ShiftCreationRequestModel, SwapShiftsRequestModel
 from app.utils.dependencies import UserValidator
 from app.utils.error_handlers import ErrorHandlingLoggingRoute
 from app.utils.jwt_helper import get_current_user
@@ -18,13 +18,29 @@ router = APIRouter(route_class = ErrorHandlingLoggingRoute)
 async def get_shits(
     session: AsyncSession = Depends(get_db_instance)
 ):
-    shift_ids = await get_shift_details_db(session = session)
+    shift_details = await get_shift_details_db(session = session)
     
     return {
         "success": True,
-        "shift_ids": shift_ids
+        "shift_ids": shift_details
     }
 
+@router.post('')
+async def create_shifts(
+    request_data: ShiftCreationRequestModel,
+    session: AsyncSession = Depends(get_db_instance)
+):
+    shift_id = await create_shift_db(
+        session = session,
+        day = request_data.day,
+        start_time = request_data.start_time,
+        end_time = request_data.end_time
+    )
+    await session.commit()
+    return {
+        "success": True,
+        "shift_id": shift_id
+    }
 
 @router.get("/assign", dependencies = [Depends(UserValidator([Role.STAFF]))])
 async def get_assigned_shifts(

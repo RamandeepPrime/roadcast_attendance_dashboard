@@ -1,8 +1,10 @@
+import datetime
 from typing import Dict, List, Tuple
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import delete, exists, func, select, and_
-from app.database.custom_errors import DataExtractionError, DataInjectionError, DatabaseErrors, InvalidDataError, ItemNotFound
+from sqlalchemy.exc import IntegrityError as SQLIntegrityError
+from app.database.custom_errors import DataExtractionError, DataInjectionError, DatabaseErrors, InvalidDataError, ItemNotFound, IntegrityError
 from app.database.database import RosterMember, RosterMemberOffDay, RosterShift, Shift, User
 from app.database.enums import Weekday
 from app.database.queries.roster import get_roster_member_id_db
@@ -21,16 +23,49 @@ async def get_shift_details_db(
     if shift_id:
         filters.append(Shift.id == shift_id)
     
-    statement = select(Shift)
+    statement = select(
+        Shift.id,
+        Shift.day,
+        Shift.start_time,
+        Shift.end_time
+    )
     if filters:
         statement = statement.where(*filters)
     try:
         result = await session.execute(statement)
-        shifts = result.scalars().all()
+        shifts = result.mappings().all()
         if not shifts:
             logger.warning("No shifts found in the database.")
             return []
         return shifts
+    except DatabaseErrors:
+        logger.error("Database error occurred while fetching all shifts.", exc_info=True)
+        raise
+    except Exception:
+        logger.error("Unexpected error occurred while fetching all shifts.", exc_info=True)
+        raise DataExtractionError(message="Failed to retrieve shifts. Please try again.")
+    
+async def create_shift_db(
+    session: AsyncSession,
+	day: Weekday,
+    start_time: datetime.datetime,
+    end_time: datetime.datetime
+) -> List[int]:
+    
+    statement = insert(Shift).values({
+        Shift.day: day,
+        Shift.start_time: start_time,
+        Shift.end_time: end_time
+	})
+    statement = statement.returning(Shift.id)
+    
+    try:
+        data = await session.execute(statement)
+        return data.scalar_one_or_none()
+    
+    except SQLIntegrityError:
+        raise IntegrityError("Shift with same data already exists")
+        
     except DatabaseErrors:
         logger.error("Database error occurred while fetching all shifts.", exc_info=True)
         raise
@@ -140,7 +175,7 @@ async def assign_shift_to_staff_db(
     off_days = await get_users_off_days_db(session = session, roster_id = roster_id, user_id = user_id)
     shift_details = await get_shift_details_db(session = session, shift_id = shift_id)
 
-    if shift_details[0].day in off_days:
+    if shift_details[0]['day'] in off_days:
         raise InvalidDataError("You can't assign shift for user off days")
 
     # Assign the shift

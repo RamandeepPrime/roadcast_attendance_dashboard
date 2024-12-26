@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime, time
 from typing import List, Literal
 from pydantic import BaseModel
 
@@ -92,3 +93,9 @@ class SwapShiftsRequestModel(BaseModel):
 		
 	async def validate_request(self, session):
 		await self._validate_roster_id(session = session)
+
+
+class ShiftCreationRequestModel(BaseModel):
+	day: Weekday
+	start_time: time
+	end_time: time 
