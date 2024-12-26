@@ -2,13 +2,6 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
-
-# from src.common.utils.constants import EZ_FILE_IDS
-# from src.common.utils.cloudwatch import CloudwatchInstance
-# from src.common.utils.s3_helper import S3Instance
-# from src.db.functions.tm_files import get_ez_tm_file_ids
-# from src.db.utils import SessionFactory
-# from src.resources import router
 from app.routers import router
 
 app = FastAPI(

@@ -4,13 +4,22 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db_instance
 from app.database.database import User
 from app.database.enums import Role
-from app.database.queries.shifts import assign_shift_to_staff_db, create_shift_db, get_allocated_shifts_db, get_shift_details_db, swap_shifts_db
+from app.database.queries.shifts import (
+    assign_shift_to_staff_db,
+    create_shift_db,
+    get_allocated_shifts_db,
+    get_shift_details_db,
+    swap_shifts_db,
+)
 from app.database.queries.user import get_user_by_email_db
-from app.routers.pydantics.shifts import AssignShiftsRequestModel, ShiftCreationRequestModel, SwapShiftsRequestModel
+from app.routers.pydantics.shifts import (
+    AssignShiftsRequestModel,
+    ShiftCreationRequestModel,
+    SwapShiftsRequestModel,
+)
 from app.utils.dependencies import UserValidator
 from app.utils.error_handlers import ErrorHandlingLoggingRoute
 from app.utils.jwt_helper import get_current_user
-
 
 router = APIRouter(route_class = ErrorHandlingLoggingRoute)
 

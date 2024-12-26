@@ -1,19 +1,23 @@
 
 
 from fastapi import APIRouter, Depends
-
-from app.database import get_db_instance
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.database import get_db_instance
 from app.database.database import User
 from app.database.enums import Role
-from app.database.queries.roster import add_member_to_roster_db, create_roster_db, delete_member_from_roster_db, get_roster_db, get_roster_details_db
+from app.database.queries.roster import (
+    add_member_to_roster_db,
+    create_roster_db,
+    delete_member_from_roster_db,
+    get_roster_db,
+    get_roster_details_db,
+)
 from app.database.queries.user import get_user_by_email_db
 from app.routers.pydantics.roster import RosterMemberRequestModel
 from app.utils.dependencies import UserValidator
 from app.utils.error_handlers import ErrorHandlingLoggingRoute
 from app.utils.jwt_helper import get_current_user
-
 
 router = APIRouter(
     route_class = ErrorHandlingLoggingRoute,

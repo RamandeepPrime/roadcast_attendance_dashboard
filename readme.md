@@ -60,11 +60,17 @@ The **Attendance Management System with Image Capture** is a web application des
 	
 	2. **Configure database settings in the .env file.**
 		Update the .env file with the required database configuration.
+
 	3. **Run migrations:**
 		```bash
 		alembic upgrade head
 		```
-	4. **Start the server:**
+
+	4. **Create Dummy Users:**
+		```bash
+		python3 create_dummy_users
+		```
+	5. **Start the server:**
 
 		```bash
 		python manage.py runserver

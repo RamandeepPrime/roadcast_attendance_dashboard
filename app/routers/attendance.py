@@ -1,8 +1,9 @@
 
 import os
-from fastapi import APIRouter, Depends, UploadFile, Form
-from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timedelta
+
+from fastapi import APIRouter, Depends, Form, UploadFile
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.file_upload import save_image
 from app.database import get_db_instance
@@ -14,7 +15,6 @@ from app.database.queries.shifts import get_allocated_shifts_db
 from app.utils.custom_errors import PermissionDeniedError
 from app.utils.error_handlers import ErrorHandlingLoggingRoute
 from app.utils.jwt_helper import get_current_user
-
 
 router = APIRouter(route_class = ErrorHandlingLoggingRoute)
 

@@ -17,4 +17,3 @@ class Weekday(enum.Enum):
 class AttendanceStatus(enum.Enum):
     PRESENT = "Present"
     ABSENT = "Absent"
-    # do i need to put weekoff here ? or just join at the last second

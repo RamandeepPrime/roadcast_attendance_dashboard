@@ -10,7 +10,6 @@ from app.utils.error_handlers import ErrorHandlingLoggingRoute
 from app.utils.jwt_helper import create_access_token, get_current_user
 from app.utils.pwd_helper import get_password_hash, verify_password
 
-
 router = APIRouter(route_class = ErrorHandlingLoggingRoute)
 
 @router.post('')
